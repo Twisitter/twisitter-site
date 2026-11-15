@@ -1,6 +1,6 @@
 # Twisitter privacy policy
 
-Draft of 2026-11-14. Twisitter is a browser extension that tells you when X
+Last updated 2026-11-15. Twisitter is a browser extension that tells you when X
 hides your replies from other people. It runs entirely in your browser.
 
 ## What it reads, and from where
@@ -23,13 +23,18 @@ analytics, no tracking.
 
 Only in your browser's extension storage:
 
-- your X account's id and handle;
-- for each reply it watches: the reply's id, the id of the post it answers, its
-  first 500 characters, and what each check found;
-- your second account's handle, id and X login cookies, if you connect one;
+- your X account's id and handle, and whether X is holding it back until it's
+  sure a person runs it (X's "Unlock more on X");
+- for each reply it watches: the reply's id and date, the id of the post it
+  answers, its first 500 characters, and the results of its last 20 checks,
+  such as where the reply sat among the others and X's own label for that
+  place;
+- your second account's handle, id and X login cookies, and whether X was
+  holding it back when it signed in, if you connect one;
 - while that account signs in, a copy of your own X cookies, deleted once
   they're back in your browser;
-- the request settings X's pages use, and a count of recent reads.
+- the request settings X's pages use, a count of recent reads, the state of
+  each account's session, and which replies it has already told you about.
 
 ## Your second account's login
 
