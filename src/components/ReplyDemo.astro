@@ -1,0 +1,77 @@
+---
+// One made-up post and its replies, as the replier sees it and as everyone
+// else does. No real accounts or posts. The note under the reply uses the
+// extension's own words.
+const post = {
+  name: 'Popular Account',
+  initial: 'P',
+  time: '4h',
+  text: "What's one habit that made learning a new language easier for you?",
+}
+const others = [
+  { name: 'Maya', initial: 'M', time: '3h', text: 'Watching shows with subtitles in the language, not in English.' },
+  { name: 'Sam', initial: 'S', time: '2h', text: 'Ten minutes of flashcards every morning. No more, no less.' },
+]
+const mine = {
+  time: '3h',
+  text: 'Speaking from day one. Mistakes are how you learn, and an online tutor costs less than a textbook.',
+}
+---
+<div class="demo">
+  <figure class="pane">
+    <figcaption><span class="dot" aria-hidden="true"></span>Your view <span class="who">signed in as you</span></figcaption>
+    <div class="tw post">
+      <div class="avatar big" aria-hidden="true">{post.initial}</div>
+      <div class="tw-body">
+        <div class="tw-meta"><b>{post.name}</b> <span>· {post.time}</span></div>
+        <p class="tw-text">{post.text}</p>
+      </div>
+    </div>
+    <div class="tw">
+      <div class="avatar you" aria-hidden="true">Y</div>
+      <div class="tw-body">
+        <div class="tw-meta"><b>You</b> <span>@you · {mine.time}</span></div>
+        <p class="tw-text">{mine.text}</p>
+        <div class="tw-note">
+          <strong>Twisitter: Behind "Show probable spam"</strong> @yoursecond sees it only after clicking "Show probable
+          spam", in Relevant order, and not at all in Recent order. Checked 2 min ago.
+        </div>
+      </div>
+    </div>
+    {
+      others.map(r => (
+        <div class="tw">
+          <div class="avatar" aria-hidden="true">{r.initial}</div>
+          <div class="tw-body">
+            <div class="tw-meta"><b>{r.name}</b> <span>· {r.time}</span></div>
+            <p class="tw-text">{r.text}</p>
+          </div>
+        </div>
+      ))
+    }
+  </figure>
+
+  <figure class="pane">
+    <figcaption><span class="dot others" aria-hidden="true"></span>Everyone else <span class="who">any other account</span></figcaption>
+    <div class="tw post">
+      <div class="avatar big" aria-hidden="true">{post.initial}</div>
+      <div class="tw-body">
+        <div class="tw-meta"><b>{post.name}</b> <span>· {post.time}</span></div>
+        <p class="tw-text">{post.text}</p>
+      </div>
+    </div>
+    {
+      others.map(r => (
+        <div class="tw">
+          <div class="avatar" aria-hidden="true">{r.initial}</div>
+          <div class="tw-body">
+            <div class="tw-meta"><b>{r.name}</b> <span>· {r.time}</span></div>
+            <p class="tw-text">{r.text}</p>
+          </div>
+        </div>
+      ))
+    }
+    <span class="fold">Show probable spam</span>
+    <span class="fold-note">Your reply is behind this button, after all the others.</span>
+  </figure>
+</div>

@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro'
+// The extension repo's PRIVACY.md, copied by `yarn sync-privacy`; the tests
+// check the two still match.
+import { Content } from '../text/privacy.md'
+---
+<Base
+  title="Privacy policy · Twisitter"
+  description="What Twisitter reads, what it keeps in your browser, and what it never does. It talks to x.com and nothing else."
+  path="/privacy"
+>
+  <main id="main" class="container">
+    <article class="prose">
+      <Content />
+    </article>
+  </main>
+</Base>

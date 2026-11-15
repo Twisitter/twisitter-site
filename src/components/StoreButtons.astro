@@ -1,0 +1,22 @@
+---
+import { CHROME_URL, EDGE_URL, FIREFOX_URL } from '../data/links'
+
+const live = [
+  { name: 'Chrome', url: CHROME_URL },
+  { name: 'Edge', url: EDGE_URL },
+  { name: 'Firefox', url: FIREFOX_URL },
+].filter(s => s.url)
+---
+{
+  live.length ? (
+    <div class="cta-row">
+      {live.map((s, i) => (
+        <a class:list={['btn', i === 0 ? 'btn-primary' : '']} href={s.url} rel="noopener">
+          Add to {s.name}
+        </a>
+      ))}
+    </div>
+  ) : (
+    <p class="soon">Coming soon to Chrome, Edge and Firefox</p>
+  )
+}

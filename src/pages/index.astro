@@ -1,0 +1,215 @@
+---
+import Base from '../layouts/Base.astro'
+import ReplyDemo from '../components/ReplyDemo.astro'
+import StoreButtons from '../components/StoreButtons.astro'
+
+const description =
+  'A free browser extension that tells you when X shows you your replies as normal but hides them from everyone else: behind "Show probable spam", out of the reply list, or hidden by the post\'s author.'
+
+// Shown on the page and given to search engines as FAQPage data: one list, so
+// the two can't drift apart.
+const faq = [
+  {
+    q: 'Why does Twisitter need a second X account?',
+    a: [
+      "X always shows you your own reply, so your account can't tell you what others see. Twisitter reads the same posts as a second X account of yours, the way anyone else would, and compares the two.",
+      'If X is holding that second account back too ("Unlock more on X"), Twisitter says so, since its view may then differ from most people\'s.',
+    ],
+  },
+  {
+    q: 'Does Twisitter see my password?',
+    a: [
+      "No. You sign in to the second account on X's own login page. Your own login is set aside while you do, and comes back right after.",
+      "Twisitter keeps the second account's login cookies in the extension and sends them only to x.com, with its own reads. Disconnect deletes them.",
+    ],
+  },
+  {
+    q: 'Could this get my accounts in trouble with X?',
+    a: [
+      'Twisitter only opens what anyone browsing X opens: a post and its replies, the hidden-replies page, a reply on its own. It goes slowly, one reply every five minutes at most with a few seconds between reads, far under X\'s own limits. It never posts, likes or follows.',
+      'Still, only X decides how it treats an account.',
+    ],
+  },
+  {
+    q: 'What about replies I post from my phone?',
+    a: [
+      "Twisitter runs in your desktop browser. While that browser is open and signed in to x.com, it reads your Replies tab every half hour, so replies from X's apps from the last 30 days get checked too. Older replies can be added by pasting their link.",
+    ],
+  },
+  {
+    q: 'What happens when it finds a hidden reply?',
+    a: [
+      "You get one notification for that reply, and a note under it on x.com. The popup shows what others see, where your reply sits among theirs, a likely reason when X's own data gives one, and what changed between checks.",
+    ],
+  },
+  {
+    q: 'Is it free?',
+    a: ["Yes. There's no account to make, nothing to buy and no data to sell. It runs in your browser and talks only to x.com."],
+  },
+]
+---
+<Base title="Twisitter: see when X hides your replies from others" description={description} path="/">
+  <Fragment slot="head">
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: 'Twisitter',
+        applicationCategory: 'BrowserApplication',
+        operatingSystem: 'Chrome, Edge, Firefox',
+        description,
+        url: 'https://twisitter.com/',
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      })}
+    />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faq.map(f => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a.join(' ') },
+        })),
+      })}
+    />
+  </Fragment>
+
+  <main id="main">
+    <section class="hero">
+      <div class="container">
+        <p class="eyebrow">Free browser extension for Chrome, Edge and Firefox</p>
+        <h1>See when X <span class="cut">hides</span> your replies from everyone else</h1>
+        <p class="lede">
+          X can file your reply under "Show probable spam", leave it out of a post's replies, or let the post's author
+          hide it, and it doesn't tell you. Your reply still looks normal to you. <strong>Twisitter</strong> checks how
+          your replies look to others, and tells you when they're hidden.
+        </p>
+        <StoreButtons />
+        <p class="cta-note">No account with us. No servers. It reads x.com, and nothing else.</p>
+        <ReplyDemo />
+      </div>
+    </section>
+
+    <section class="section" id="ways">
+      <div class="container">
+        <div class="section-head">
+          <h2>Three ways X hides a reply without telling you</h2>
+          <p>X doesn't tell you about any of them.</p>
+        </div>
+        <div class="ways">
+          <article class="way">
+            <span class="tag">Behind "Show probable spam"</span>
+            <h3>Filed as probable spam</h3>
+            <p>
+              X moves the reply behind a "Show probable spam" button at the end of the replies, in Relevant order.
+              Recent order leaves it out altogether.
+            </p>
+          </article>
+          <article class="way">
+            <span class="tag">Missing for others</span>
+            <h3>Left out of the list</h3>
+            <p>The reply is in no list under the post, in any order, though it still opens from a direct link.</p>
+          </article>
+          <article class="way">
+            <span class="tag">Hidden by the post's author</span>
+            <h3>Hidden by the author</h3>
+            <p>
+              The post's author hid it. Others find it only on the post's hidden-replies page, and X doesn't tell the
+              reply's writer.
+            </p>
+          </article>
+        </div>
+        <p class="aside">
+          In the first two, X keeps showing you your reply where you left it. A hidden reply opened from its link can
+          also show others "This Post is unavailable".
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="how">
+      <div class="container">
+        <div class="section-head">
+          <h2>How Twisitter checks</h2>
+          <p>It compares your view of each reply with a second account's, the way a friend would look for you.</p>
+        </div>
+        <ol class="steps">
+          <li>
+            <h3>It notices your replies</h3>
+            <p>
+              Replies you post on x.com are picked up as you post them. Replies from X's apps come in from your Replies
+              tab, which Twisitter reads every half hour.
+            </p>
+          </li>
+          <li>
+            <h3>It looks as someone else</h3>
+            <p>
+              You connect a second X account of yours, on X's own login page. Twisitter reads the post as that account:
+              the replies, the "Show probable spam" fold, the hidden-replies page and your reply on its own. Nothing
+              that anyone browsing X wouldn't open.
+            </p>
+          </li>
+          <li>
+            <h3>It checks again for a month</h3>
+            <p>
+              About two minutes after you post, then after an hour, six hours, a day, three days, a week, two weeks
+              and a month. One reply every five minutes, with a few seconds between reads.
+            </p>
+          </li>
+          <li>
+            <h3>It tells you what others see</h3>
+            <p>
+              A notification when X hides a reply, and a note under it on x.com. The popup shows where the reply sits
+              for others, a likely reason when X's own data gives one, and what changed between checks.
+            </p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" id="privacy">
+      <div class="container">
+        <div class="section-head">
+          <h2>Everything stays in your browser</h2>
+          <p>Twisitter is an extension and nothing more. There's no server behind it.</p>
+        </div>
+        <ul class="promises">
+          <li><strong>Only x.com</strong><span>It talks to x.com and nothing else: no servers, no analytics, no tracking.</span></li>
+          <li><strong>No passwords</strong><span>Your second account signs in on X's own page. Twisitter never sees a password or a code.</span></li>
+          <li><strong>Read-only</strong><span>It never posts, likes, follows, blocks or changes anything on X.</span></li>
+          <li><strong>Yours to delete</strong><span>Disconnect deletes the second account's login. Uninstalling deletes everything.</span></li>
+        </ul>
+        <a class="more-link" href="/privacy">Read the privacy policy</a>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="container">
+        <div class="section-head">
+          <h2>Questions</h2>
+        </div>
+        <div class="faq">
+          {
+            faq.map(f => (
+              <details>
+                <summary>{f.q}</summary>
+                {f.a.map(p => (
+                  <p>{p}</p>
+                ))}
+              </details>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="section get" id="get">
+      <div class="container">
+        <h2>Know what others see.</h2>
+        <StoreButtons />
+      </div>
+    </section>
+  </main>
+</Base>
