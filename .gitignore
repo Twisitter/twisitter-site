@@ -3,6 +3,10 @@ node_modules/
 .wrangler/
 .claude/
 dist/
+dist-prelaunch/
+deploy/public/
+deploy/node_modules
+deploy/.cloudflare/
 .astro/
 .yarn/*
 !.yarn/releases
