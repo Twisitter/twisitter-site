@@ -9,8 +9,11 @@ Twisitter talks to x.com and to nothing else: no servers of ours, no
 analytics, no tracking.
 
 - **As you**, with your own X login in this browser: your Replies tab, to learn
-  about replies you post from X's apps, and the replies under a post, to confirm
-  that X shows you your own reply.
+  about replies you post from X's apps; the replies under a post, to confirm
+  that X shows you your own reply; and a reply opened directly, when you add
+  one by its link. For a reply your second account wrote, the roles swap: the
+  post, its replies, its hidden-replies page and the reply are read as you,
+  and as your second account to confirm X shows it to its writer.
 - **As your second X account**, if you connect one: a post and its replies
   (including the ones behind "Show probable spam"), the post's hidden-replies
   page, and a reply opened directly. These are the same pages anyone browsing X
