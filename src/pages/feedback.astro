@@ -15,15 +15,22 @@ import Base from '../layouts/Base.astro'
       <h1>Report a problem</h1>
       <p class="fb-lead">Something not working right, an idea, or a question: all welcome.</p>
 
-      <!-- shown to a visit that didn't come from the extension, which brings no details -->
+      <!-- shown when no details came along: a visit that didn't come from the extension, or Deny on Firefox's
+           data question, which the extension's button asks again each time until it gets Allow -->
       <aside id="fb-from-extension" class="fb-hint" hidden>
         <img class="fb-hint-mark" src="/assets/mark.svg" alt="" width="28" height="28" />
-        <p>
-          <strong>Have Twisitter installed?</strong> Report from the extension, and the details that help find a
-          problem come along. Click Twisitter's icon in your browser's toolbar (it may be under the puzzle-piece
-          Extensions menu), then <strong>Report a problem</strong> at the bottom. This form opens again with the
-          extension's version, status and diagnostic log filled in, and you see all of it before anything is sent.
-        </p>
+        <div>
+          <p>
+            <strong>Have Twisitter installed?</strong> Report from the extension, and the details that help find a
+            problem come along. Click Twisitter's icon in your browser's toolbar (it may be under the puzzle-piece
+            Extensions menu), then <strong>Report a problem</strong> at the bottom. This form opens again with the
+            extension's version, status and diagnostic log filled in, and you see all of it before anything is sent.
+          </p>
+          <p>
+            In Firefox, choose <strong>Allow</strong> when it asks about "technical and interaction data", or this
+            form opens without the details. Chose Deny? It asks again the next time you click Report a problem.
+          </p>
+        </div>
       </aside>
 
       <form id="fb-form" class="fb-form" novalidate>
@@ -56,6 +63,8 @@ import Base from '../layouts/Base.astro'
           </label>
           <details>
             <summary>See everything included</summary>
+            <!-- the extension's log stamps are UTC (its diaglog.ts), which a reader would take for local time -->
+            <p class="fb-note">Times in the log are in UTC, not your local time.</p>
             <pre id="fb-details-text" class="fb-pre"></pre>
           </details>
           <p class="fb-note">Never included: your X username, your sessions, or what your posts say.</p>
