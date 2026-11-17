@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro'
+// What X's published code and its Under the Hood report say about replies, with
+// links to the code at the commit read. Not part of dist-prelaunch.
+import { Content } from '../text/findings.md'
+---
+<Base
+  title="What X's own code says about your replies · Twisitter"
+  description="X's Under the Hood report has no labels for replies. X's published code scores replies from 0 to 3, and the score only goes down. What that means, with links to the code."
+  path="/findings"
+>
+  <main id="main" class="container">
+    <article class="prose">
+      <Content />
+    </article>
+  </main>
+</Base>
