@@ -225,12 +225,12 @@ h1 { font-size: 1.4rem; }
 .entry { border: 1px solid #2f3336; border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; }
 .entry.read { opacity: 0.45; }
 .meta { font-size: 0.85rem; color: #71767b; margin-bottom: 4px; }
-.msg { white-space: pre-wrap; }
+.msg { white-space: pre-wrap; margin-top: 6px; }
 .badge { display: inline-block; background: #1d9bf0; color: #fff; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; }
-.actions { margin-top: 8px; display: flex; gap: 6px; }
-.btn { font: inherit; font-size: 0.78rem; padding: 3px 10px; border-radius: 999px; border: 1px solid #536471; background: #16181c; color: #e7e9ea; text-decoration: none; }
+.actions { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { font: inherit; font-size: 0.78rem; padding: 4px 12px; border-radius: 999px; border: 1px solid #536471; background: #16181c; color: #e7e9ea; text-decoration: none; }
 .btn:hover { background: #2f3336; }
-.det { margin-top: 8px; font-size: 0.85rem; color: #aab; }
+.det { margin-top: 12px; font-size: 0.85rem; color: #aab; }
 .det pre { white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow: auto; background: #16181c; padding: 8px; border-radius: 6px; }
 </style>
 </head><body>
@@ -245,8 +245,8 @@ ${entries
 <div class="meta"><span class="badge">${esc(e.type)}</span> ${esc(e.ts)}${e.username ? ` · ${esc(e.username)}` : ''}${e.email ? ` · ${esc(e.email)}` : ''}</div>
 <div class="msg">${esc(e.message)}</div>
 ${e.details ? `<details class="det"><summary>Twisitter ${esc(e.details.v)} · ${esc(e.details.b)}</summary><pre>${esc(e.details.s)}\n\n${esc(e.details.l)}</pre></details>` : ''}
-${e.filed && env.GITHUB_REPO ? `<div class="meta"><a class="btn" rel="noreferrer" href="https://github.com/${esc(env.GITHUB_REPO)}/issues?q=${encodeURIComponent(e.id)}">GitHub issue</a></div>` : ''}
 <div class="actions">
+    ${e.filed && env.GITHUB_REPO ? `<a class="btn" rel="noreferrer" href="https://github.com/${esc(env.GITHUB_REPO)}/issues?q=${encodeURIComponent(e.id)}">GitHub issue</a>` : ''}
     <a class="btn" href="?key=${qk}&action=read&id=${encodeURIComponent(e.id)}">${e.read ? 'Mark unread' : 'Mark read'}</a>
     <a class="btn" href="?key=${qk}&action=delete&id=${encodeURIComponent(e.id)}" onclick="return confirm('Delete this report?')">Delete</a>
 </div>

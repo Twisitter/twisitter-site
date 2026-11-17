@@ -15,6 +15,17 @@ import Base from '../layouts/Base.astro'
       <h1>Report a problem</h1>
       <p class="fb-lead">Something not working right, an idea, or a question: all welcome.</p>
 
+      <!-- shown to a visit that didn't come from the extension, which brings no details -->
+      <aside id="fb-from-extension" class="fb-hint" hidden>
+        <img class="fb-hint-mark" src="/assets/mark.svg" alt="" width="28" height="28" />
+        <p>
+          <strong>Have Twisitter installed?</strong> Report from the extension, and the details that help find a
+          problem come along. Click Twisitter's icon in your browser's toolbar (it may be under the puzzle-piece
+          Extensions menu), then <strong>Report a problem</strong> at the bottom. This form opens again with the
+          extension's version, status and diagnostic log filled in, and you see all of it before anything is sent.
+        </p>
+      </aside>
+
       <form id="fb-form" class="fb-form" novalidate>
         <div class="fb-field">
           <label for="fb-type">What is it?</label>
@@ -114,6 +125,8 @@ import Base from '../layouts/Base.astro'
       const d = hideIds.checked ? hidden : details
       if (d) $('fb-details-text').textContent = `${d.s}\n\n${d.l}`
     }
+    // no details: point the person at the extension's own button
+    if (!details) $('fb-from-extension').hidden = false
     if (details) {
       $('fb-details').hidden = false
       $('fb-details-line').textContent = `Twisitter ${details.v} · ${details.b}`

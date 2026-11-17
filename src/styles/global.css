@@ -658,6 +658,26 @@ p {
   color: var(--muted);
   margin-bottom: 28px;
 }
+.fb-hint {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin: 0 0 28px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--blue);
+  border-radius: 12px;
+  background: var(--card);
+}
+.fb-hint-mark {
+  flex: none;
+  margin-top: 2px;
+}
+/* not the lead paragraph's grey or spacing (.prose p) */
+.prose .fb-hint p {
+  margin: 0;
+  color: var(--fg);
+}
 .fb-form {
   display: grid;
   gap: 20px;
