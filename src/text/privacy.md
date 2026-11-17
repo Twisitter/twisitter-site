@@ -1,13 +1,14 @@
 # Twisitter privacy policy
 
-Last updated 2026-11-15. Twisitter is a browser extension that tells you when X
+Last updated 2026-11-16. Twisitter is a browser extension that tells you when X
 hides your replies from other people, and, when you ask, whether it hides
 another account's. It runs entirely in your browser.
 
 ## What it reads, and from where
 
-Twisitter talks to x.com and to nothing else: no servers of ours, no
-analytics, no tracking.
+Twisitter talks to x.com and to nothing else: no analytics, no tracking. The
+one thing that ever goes to a server of ours is a problem report, and only when
+you send one (see "Problem reports" below).
 
 - **As you**, with your own X login in this browser: your Replies tab, to learn
   about replies you post from X's apps; the replies under a post, to confirm
@@ -53,7 +54,11 @@ Only in your browser's extension storage:
 - while that account signs in, a copy of your own X cookies, deleted once
   they're back in your browser;
 - the request settings X's pages use, a count of recent reads, the state of
-  each account's session, and which replies it has already told you about.
+  each account's session, and which replies it has already told you about;
+- a diagnostic log for problem reports, its newest 400 lines: when it checked
+  and what the checks came to, how X answered its reads, and when a sign-in,
+  an account check or an account's trouble began or ended. It has post ids,
+  but no account's name or id, no cookies, and nothing your posts say.
 
 ## Your second account's login
 
@@ -63,11 +68,37 @@ browser, and they're put back right after. The second account's cookies stay in
 the extension. They're sent only to x.com, and only with Twisitter's own
 requests.
 
+## Problem reports
+
+"Report a problem" in the popup opens a form on twisitter.com with the version,
+your browser, a summary of how things stand and the diagnostic log filled in.
+They travel in the page's address after the #, which browsers never send to a
+server, and nothing leaves your browser until you send the form. You can leave
+them out, and see everything they hold first. On Firefox they come along only
+if you allow Twisitter's "technical and interaction data", which Firefox asks
+you about. They never include your X username, either account's id, your
+sessions, or what your posts say. They do include post ids, which lead to
+whoever wrote each post, and for your own replies that's you, unless you tick
+"Hide post ids".
+
+- **Sent privately**, a report goes to twisitter.com, which runs on
+  Cloudflare. It's kept there, and filed as an issue in a private GitHub
+  repository only the developer can read (GitHub emails the developer a copy),
+  until the developer deletes it. Your X username and email go with it only if
+  you type them in. So that no one address, or for IPv6 one network, can send
+  more than five reports an hour, twisitter.com counts them by a one-way
+  scrambled form of the address, never the address itself, and drops the count
+  after two hours.
+- **Posted publicly**, a report is a GitHub issue you file yourself, with your
+  GitHub account, for anyone to read. The form fills it in, always with post
+  ids hidden, and sends nothing to twisitter.com.
+
 ## What it never does
 
-It never posts, deletes, likes, follows, blocks or changes settings on X. It
-sends nothing to anyone but x.com. It doesn't sell or share data, and has none
-of yours outside your browser.
+It never posts, deletes, likes, follows, blocks or changes settings on X.
+Apart from a problem report you send, it sends nothing to anyone but x.com. It
+doesn't sell or share data, and has none of yours outside your browser but the
+reports you send.
 
 ## Removing your data
 
@@ -79,7 +110,10 @@ of yours outside your browser.
   progress after 30 days, and what a tab scrolled after six hours, when you
   close the tab, or when the browser restarts. Twisitter clears these at
   least hourly while it runs.
-- **Uninstalling** Twisitter deletes everything it kept.
+- **A private report** you sent: send another one asking for it to be deleted,
+  and say when you sent it.
+- **Uninstalling** Twisitter deletes everything it kept, the diagnostic log
+  included.
 
 ## Changes
 

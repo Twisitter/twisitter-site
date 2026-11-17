@@ -1,7 +1,7 @@
-// Builds dist-prelaunch from dist: the privacy page alone, so the stores have a
-// privacy-policy URL while the extension waits for review. twisitter.com/
-// sends visitors to /privacy, and search engines are asked to stay away. At
-// launch, the full site (dist) is deployed in its place.
+// Builds dist-prelaunch from dist: the privacy page and the report form alone,
+// so the stores have a privacy-policy URL and the extension's "Report a problem"
+// works while the full site waits. twisitter.com/ sends visitors to /privacy,
+// and search engines are asked to stay away. At launch, dist replaces it.
 
 import fs from 'node:fs'
 import path from 'node:path'
@@ -10,8 +10,8 @@ import { fileURLToPath } from 'node:url'
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
 const from = path.join(root, 'dist')
 const to = path.join(root, 'dist-prelaunch')
-// the two pages, and what they load
-const keep = ['privacy.html', '404.html', '_astro', 'assets', 'favicon.ico', 'apple-touch-icon.png', '_headers']
+// the three pages, and what they load
+const keep = ['privacy.html', 'feedback.html', '404.html', '_astro', 'assets', 'favicon.ico', 'apple-touch-icon.png', '_headers']
 
 if (!fs.existsSync(path.join(from, 'privacy.html'))) throw new Error('No build in dist: run yarn build first.')
 fs.rmSync(to, { recursive: true, force: true })

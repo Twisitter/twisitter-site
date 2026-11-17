@@ -8,15 +8,20 @@ interface Props {
   description: string
   path: string
   noindex?: boolean
+  // the report form: its own script, and requests to this site only
+  script?: boolean
 }
 
-const { title, description, path, noindex = false } = Astro.props
+const { title, description, path, noindex = false, script = false } = Astro.props
 const site = 'https://twisitter.com'
 const url = site + path
 const image = `${site}/assets/og-image.png`
 // The built pages carry their own policy too, so a local preview keeps to what
-// the live site allows: nothing from anywhere else, and no scripts at all.
-const csp = "default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'"
+// the live site allows: nothing from anywhere else, and no scripts at all, but
+// for the report form's own (public/_headers gives that page this policy alone).
+const csp =
+  "default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'" +
+  (script ? "; script-src 'self'; connect-src 'self'" : '')
 ---
 <!doctype html>
 <html lang="en">

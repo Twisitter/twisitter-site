@@ -1,0 +1,192 @@
+---
+import Base from '../layouts/Base.astro'
+// The extension's "Report a problem" opens this page with its details in the
+// link's #fragment (its report.ts). A private report goes to /api/feedback
+// (worker/feedback.js); a public one is the person's own GitHub issue.
+---
+<Base
+  title="Report a problem · Twisitter"
+  description="Tell the developer about a problem with Twisitter, privately or as a public GitHub issue. Ideas and questions are welcome too."
+  path="/feedback"
+  script
+>
+  <main id="main" class="container">
+    <article class="prose fb">
+      <h1>Report a problem</h1>
+      <p class="fb-lead">Something not working right, an idea, or a question: all welcome.</p>
+
+      <form id="fb-form" class="fb-form" novalidate>
+        <div class="fb-field">
+          <label for="fb-type">What is it?</label>
+          <select id="fb-type" class="fb-select">
+            <option value="bug">A problem</option>
+            <option value="feature">An idea</option>
+            <option value="question">A question</option>
+            <option value="other">Something else</option>
+          </select>
+        </div>
+
+        <div class="fb-field">
+          <label for="fb-message">What happened?</label>
+          <textarea id="fb-message" class="fb-textarea" required placeholder="A sentence or two is enough. What did you expect instead?"></textarea>
+        </div>
+
+        <!-- shown when the extension's "Report a problem" link brought details along -->
+        <div id="fb-details" class="fb-field fb-details" hidden>
+          <label class="fb-check">
+            <input id="fb-include" type="checkbox" checked />
+            <span>Include the details from the extension <span class="fb-optional">(they help find the problem)</span></span>
+          </label>
+          <p class="fb-note" id="fb-details-line"></p>
+          <label class="fb-check fb-check-sub">
+            <input id="fb-hide-ids" type="checkbox" />
+            <span>Hide post ids <span class="fb-optional">(an id leads to whoever wrote the post, and for your own replies
+            that's you, but it helps look into a check that went wrong)</span></span>
+          </label>
+          <details>
+            <summary>See everything included</summary>
+            <pre id="fb-details-text" class="fb-pre"></pre>
+          </details>
+          <p class="fb-note">Never included: your X username, your sessions, or what your posts say.</p>
+        </div>
+
+        <div class="fb-field">
+          <label for="fb-username">Your X username <span class="fb-optional">(optional, private reports only)</span></label>
+          <input id="fb-username" class="fb-input" type="text" autocomplete="off" />
+        </div>
+
+        <div class="fb-field">
+          <label for="fb-email">Email <span class="fb-optional">(optional, only if you'd like a reply)</span></label>
+          <input id="fb-email" class="fb-input" type="email" autocomplete="email" />
+        </div>
+
+        <!-- people leave this empty; bots fill it in -->
+        <div class="fb-hp" aria-hidden="true">
+          <label>Website <input id="fb-website" type="text" tabindex="-1" autocomplete="off" /></label>
+        </div>
+
+        <div class="fb-actions">
+          <div class="fb-action">
+            <button type="submit" class="btn btn-primary">Send privately</button>
+            <p class="fb-note">Only the developer sees it. Leave an email if you'd like a reply.</p>
+          </div>
+          <div class="fb-action">
+            <button type="button" id="fb-github" class="btn">Post publicly on GitHub</button>
+            <p class="fb-note">
+              Anyone can read it and add to it, and you can follow the replies. It needs a GitHub account, and post ids
+              are always hidden.
+            </p>
+          </div>
+        </div>
+        <div id="fb-status" class="fb-status" role="status"></div>
+      </form>
+    </article>
+  </main>
+
+  <script>
+    // What the extension's "Report a problem" link carries after #r= (its
+    // report.ts): the version, browser, status summary and diagnostic log. It
+    // never leaves this page unless the person sends it.
+    import { readDetails, idHider } from '../lib/report.js'
+    const ISSUES = 'https://github.com/Twisitter/twisitter/issues/new'
+
+    const details = readDetails(location.hash)
+    // Out of the address bar and the history, so the log doesn't linger there.
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search)
+    // The same stand-ins for this report wherever its ids are hidden: in a
+    // private report the person chose to hide them in, and always in a public one.
+    const hide = idHider()
+    const hidden = details && { ...details, s: hide(details.s), l: hide(details.l) }
+    const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T
+    const form = $<HTMLFormElement>('fb-form')
+    const status = $<HTMLDivElement>('fb-status')
+    const type = $<HTMLSelectElement>('fb-type')
+    const include = $<HTMLInputElement>('fb-include')
+    const hideIds = $<HTMLInputElement>('fb-hide-ids')
+    const say = (text: string, kind: '' | 'ok' | 'err' = '') => {
+      status.textContent = text
+      status.className = `fb-status ${kind}`.trim()
+    }
+
+    // what a private report would send, which the box shows
+    const sending = () => (details && include.checked ? (hideIds.checked ? hidden : details) : null)
+    const preview = () => {
+      const d = hideIds.checked ? hidden : details
+      if (d) $('fb-details-text').textContent = `${d.s}\n\n${d.l}`
+    }
+    if (details) {
+      $('fb-details').hidden = false
+      $('fb-details-line').textContent = `Twisitter ${details.v} · ${details.b}`
+      preview()
+    }
+    hideIds.addEventListener('change', preview)
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault()
+      say('')
+      const message = $<HTMLTextAreaElement>('fb-message').value.trim()
+      if (!message) return say('Please say what happened.', 'err')
+      const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement
+      btn.disabled = true
+      btn.textContent = 'Sending…'
+      try {
+        const res = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: type.value,
+            message,
+            username: $<HTMLInputElement>('fb-username').value,
+            email: $<HTMLInputElement>('fb-email').value,
+            details: sending(),
+            website: $<HTMLInputElement>('fb-website').value,
+          }),
+        })
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Failed')
+        say('Sent. Thank you!', 'ok')
+        form.reset()
+        preview()
+      } catch (err) {
+        say(err instanceof Error && err.message !== 'Failed' ? err.message : 'Something went wrong. Try again?', 'err')
+      } finally {
+        btn.disabled = false
+        btn.textContent = 'Send privately'
+      }
+    })
+
+    // A public issue, filled in the same way. GitHub turns away very long
+    // links, so the log goes by the clipboard (copied first: the new tab takes
+    // the focus a copy needs).
+    $('fb-github').addEventListener('click', async () => {
+      const message = $<HTMLTextAreaElement>('fb-message').value.trim()
+      const d = details && include.checked ? hidden : null // public: ids always hidden
+      const params = new URLSearchParams({ template: 'problem.yml' })
+      if (message) params.set('what-happened', message.slice(0, 1500))
+      if (d) {
+        params.set('version', `${d.v}, ${d.b}`)
+        params.set('status', d.s.slice(0, 1500))
+      }
+      let copied = false
+      if (d?.l) {
+        try {
+          await navigator.clipboard.writeText(d.l)
+          copied = true
+        } catch {
+          // no clipboard: show the copy with ids hidden, to copy by hand
+          hideIds.checked = true
+          preview()
+          ;($('fb-details').querySelector('details') as HTMLDetailsElement).open = true
+        }
+      }
+      window.open(`${ISSUES}?${params}`, '_blank', 'noopener')
+      say(
+        copied
+          ? 'GitHub opened in a new tab. The log is on your clipboard: paste it into the log box there.'
+          : d
+            ? 'GitHub opened in a new tab. To add the log, copy it from the box above, where post ids are now hidden.'
+            : 'GitHub opened in a new tab.',
+        'ok',
+      )
+    })
+  </script>
+</Base>

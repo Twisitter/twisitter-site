@@ -46,6 +46,10 @@
 html {
   -webkit-text-size-adjust: 100%;
 }
+/* the hidden attribute wins over a class's display (the report form's details) */
+[hidden] {
+  display: none !important;
+}
 body {
   margin: 0;
   background: var(--bg);
@@ -646,4 +650,126 @@ p {
   margin-top: 28px;
   color: var(--muted);
   font-size: 13px;
+}
+
+/* ---- report form (feedback.astro) ---- */
+
+.fb-lead {
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+.fb-form {
+  display: grid;
+  gap: 20px;
+}
+.fb-field {
+  display: grid;
+  gap: 6px;
+}
+.fb-field > label {
+  font-weight: 700;
+}
+.fb-optional {
+  font-weight: 400;
+  color: var(--muted);
+}
+.fb-input,
+.fb-select,
+.fb-textarea {
+  width: 100%;
+  font: inherit;
+  font-size: 16px;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.fb-textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+.fb-input:focus,
+.fb-select:focus,
+.fb-textarea:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+.fb-details {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+}
+.fb-check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-weight: 700;
+}
+.fb-check input {
+  margin-top: 4px;
+  flex: none;
+}
+.fb-check-sub {
+  font-weight: 400;
+  margin-left: 24px;
+}
+.fb-note {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+.fb-pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 320px;
+  overflow: auto;
+  font-size: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+/* the honeypot: off screen, out of the tab order, hidden from screen readers */
+.fb-hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.fb-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+.fb-action {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+.fb-action .btn {
+  justify-self: start;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+.fb-action .btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.fb-status:empty {
+  display: none;
+}
+.fb-status {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--card);
+}
+.fb-status.ok {
+  border-left: 3px solid #00704a;
+}
+.fb-status.err {
+  border-left: 3px solid var(--spam);
 }
