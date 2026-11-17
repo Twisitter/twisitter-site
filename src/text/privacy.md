@@ -74,12 +74,12 @@ requests.
 your browser, a summary of how things stand and the diagnostic log filled in.
 They travel in the page's address after the #, which browsers never send to a
 server, and nothing leaves your browser until you send the form. You can leave
-them out, and see everything they hold first. On Firefox they come along only
-if you allow Twisitter's "technical and interaction data", which Firefox asks
-you about. They never include your X username, either account's id, your
-sessions, or what your posts say. They do include post ids, which lead to
-whoever wrote each post, and for your own replies that's you, unless you tick
-"Hide post ids".
+them out, and see everything they hold first. On Firefox 140 and later they
+come along only if you allow Twisitter's "technical and interaction data",
+which Firefox asks you about. They never include your X username, either
+account's id, your sessions, or what your posts say. They do include post ids,
+which lead to whoever wrote each post, and for your own replies that's you,
+unless you tick "Hide post ids".
 
 - **Sent privately**, a report goes to twisitter.com, which runs on
   Cloudflare. It's kept there, and filed as an issue in a private GitHub
