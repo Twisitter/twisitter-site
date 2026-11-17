@@ -15,8 +15,8 @@ export default defineConfig({
     // hold everywhere at once
     exports: { Limits: exports.durableObject({ storage: "sqlite" }) },
     env: {
-      // the private reports
-      FEEDBACK: bindings.kv(),
+      // the private reports (created by the first deploy, 2026-11-16)
+      FEEDBACK: bindings.kv({ id: "2f760fa0d1544e7ba5a75b7f89f102eb" }),
       LIMITS: bindings.durableObject({ worker: "twisitter-site", exportName: "Limits" }),
       // where private reports are filed: its workflow opens the issue
       GITHUB_REPO: bindings.text("Twisitter/reports"),
