@@ -1,7 +1,8 @@
 # Twisitter privacy policy
 
 Last updated 2026-11-15. Twisitter is a browser extension that tells you when X
-hides your replies from other people. It runs entirely in your browser.
+hides your replies from other people, and, when you ask, whether it hides
+another account's. It runs entirely in your browser.
 
 ## What it reads, and from where
 
@@ -18,9 +19,15 @@ analytics, no tracking.
   (including the ones behind "Show probable spam"), the post's hidden-replies
   page, and a reply opened directly. These are the same pages anyone browsing X
   opens.
+- **For an account check**, when you ask for one on another account's profile:
+  the replies under each post that account answered, the post's hidden-replies
+  page, and a reply opened directly. They're read as you, or as your second
+  account when you follow, mute or block the account checked. That account's
+  Replies tab is read only by X's own page, as you scroll it.
 - **On x.com pages:** the replies you post there (from X's own answer to the
-  page), the account the page is signed in as, and the request settings the
-  page uses. On replies that X hides from others, it adds a note.
+  page), the replies on another account's Replies tab that you open, the
+  account the page is signed in as, and the request settings the page uses. On
+  replies that X hides from others, it adds a note.
 
 ## What it keeps, and where
 
@@ -32,6 +39,15 @@ Only in your browser's extension storage:
   answers, its first 500 characters, and the results of its last 20 checks,
   such as where the reply sat among the others and X's own label for that
   place;
+- for another account's Replies tab that you open: that account's id and
+  handle, whether you follow, mute or block it and which of your accounts the
+  page was signed in as (as X's page says), and the ids and dates of its
+  replies to other accounts and of the posts they answer, for six hours, until
+  you close the tab, or until the browser restarts;
+- for each account check you ask for: each reply's id and date, the ids of the
+  post it answers and of its writer, the result, such as "behind Show probable
+  spam", and which of your accounts looked, for 30 days; and the latest check's
+  progress, with the account it checked, also for 30 days;
 - your second account's handle, id and X login cookies, and whether X was
   holding it back when it signed in, if you connect one;
 - while that account signs in, a copy of your own X cookies, deleted once
@@ -59,6 +75,10 @@ of yours outside your browser.
   keeps that login session open until you end it in X's settings: Security and
   account access, then Apps and sessions, then Sessions.
 - **Forget** removes a reply from the list.
+- **Account checks** remove themselves: their results and the latest check's
+  progress after 30 days, and what a tab scrolled after six hours, when you
+  close the tab, or when the browser restarts. Twisitter clears these at
+  least hourly while it runs.
 - **Uninstalling** Twisitter deletes everything it kept.
 
 ## Changes
