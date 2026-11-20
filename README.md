@@ -48,9 +48,9 @@ worker/feedback.js           keeps a private report, files it in the reports rep
 worker/caps.js, limits.js    the hourly caps, counted once for the whole site by a Durable Object
 src/text/privacy.md          a copy of ../twisitter/PRIVACY.md: `yarn sync-privacy`
 src/components/ReplyDemo.astro   the made-up thread, as you and as others see it
-src/data/links.ts            store URLs; empty ones show "Coming soon"
+src/data/links.ts            store URLs: a button for each one set, "Coming soon" when none is
 public/_headers              Cloudflare response headers
-scripts/prelaunch.mjs        builds dist-prelaunch: the privacy page and the form, until launch
+scripts/prelaunch.mjs        builds dist-prelaunch: the privacy page and the form alone (the site before launch)
 deploy/                      the Worker's config for `cf deploy`
 scripts/make-images.mjs      renders favicon.ico, apple-touch-icon.png and assets/og-image.png
 scripts/og-image.html        the social card's source
@@ -91,25 +91,21 @@ and `wrangler` packages (cf 1.0.0-beta.12, wrangler 4.147.0). This site doesn't
 install them, so point `deploy/node_modules` at an install that has them, and
 set `CLOUDFLARE_ACCOUNT_ID` to the account that holds twisitter.com.
 
-Until the extension is approved, only the privacy page and the report form are
-up:
-- `/` redirects to `/privacy`;
-- `robots.txt` disallows everything;
-- every response says `noindex`.
-
 ```bash
-yarn build-prelaunch                                # dist-prelaunch
-rm -rf deploy/public && cp -R dist-prelaunch deploy/public
+yarn build                                          # dist
+rm -rf deploy/public && cp -R dist deploy/public
 (cd deploy && cf deploy --dry-run) && (cd deploy && cf deploy)
 ```
 
-At launch, deploy `dist` the same way, once the store URLs are in
-`src/data/links.ts`.
+Before launch (2026-11-15 to 11-20), `yarn build-prelaunch` built
+`dist-prelaunch` instead: only the privacy page and the report form, with `/`
+redirecting to `/privacy`, a `robots.txt` that disallowed everything, and
+`noindex` on every response.
 
-## Before launch
+## Launch
 
 - [x] `PRIVACY.md` dated 2026-11-16 and synced.
 - [x] The privacy page alone at twisitter.com/privacy (2026-11-15), for the
       stores' privacy-policy URL.
-- [ ] Store URLs in `src/data/links.ts` once the listings are live.
-- [ ] Deploy the full site (`dist`).
+- [x] Store URLs in `src/data/links.ts`: Chrome 2026-11-17, Firefox 2026-11-20.
+- [x] Deploy the full site (`dist`).
