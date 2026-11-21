@@ -1,8 +1,11 @@
 import { bindings, defineConfig, exports } from "cf/config";
 
 // twisitter.com as static files on Workers; Cloudflare makes the DNS record and
-// certificate for the domain. Only /api/* runs the Worker (worker/index.js),
-// for the report form: every page is served as a file, with public/_headers.
+// certificate for the domain. Only /api/* (the report form) and the videos
+// (/assets/*.mp4) run the Worker (worker/index.js): every page is served as a
+// file, with public/_headers. Cloudflare's static files ignore a request for
+// part of a file, so the Worker sends a video in the parts a browser asks for,
+// which Chrome and Edge need to skip through it.
 export default defineConfig({
   worker: {
     name: "twisitter-site",
@@ -10,11 +13,13 @@ export default defineConfig({
     entrypoint: "../worker/index.js",
     domains: ["twisitter.com"],
     workersDev: false,
-    assets: { notFoundHandling: "404-page", runWorkerFirst: ["/api/*"] },
+    assets: { notFoundHandling: "404-page", runWorkerFirst: ["/api/*", "/assets/*.mp4"] },
     // the site's one counter of reports (worker/limits.js), so the hourly caps
     // hold everywhere at once
     exports: { Limits: exports.durableObject({ storage: "sqlite" }) },
     env: {
+      // the site's static files, which the Worker reads the videos from
+      ASSETS: bindings.assets(),
       // the private reports (created by the first deploy, 2026-11-16)
       FEEDBACK: bindings.kv({ id: "2f760fa0d1544e7ba5a75b7f89f102eb" }),
       LIMITS: bindings.durableObject({ worker: "twisitter-site", exportName: "Limits" }),

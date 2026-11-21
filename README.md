@@ -2,7 +2,8 @@
 
 The site for the Twisitter extension (`../twisitter`): one landing page, the
 privacy policy and a 404. Built with Astro to static files, served by a
-Cloudflare Worker that serves static files only (see Deploy).
+Cloudflare Worker that serves static files only, apart from `/api/*` and the
+videos (see Deploy).
 
 ## Look
 
@@ -41,10 +42,11 @@ yarn test                         # the report form and its Worker, and the priv
 src/pages/index.astro        the landing page; its FAQ list also feeds the FAQPage data
 src/pages/privacy.astro      renders src/text/privacy.md
 src/pages/feedback.astro     the report form the extension's "Report a problem" opens
-src/lib/                     the form's script, and the handler that keeps a private report, files it in
-                             the reports repo, and the inbox: synced from the shared source (below)
-worker/index.js              the Worker, for /api/* only, and the Durable Object that counts the
-                             site's reports: synced from the shared source (below)
+src/lib/                     the form's script, the handler that keeps a private report, files it in
+                             the reports repo, and the inbox, and the Worker's router, which sends a
+                             video in the parts a browser asks for: synced from the shared source (below)
+worker/index.js              the Worker, for /api/* and the videos only, and the Durable Object that
+                             counts the site's reports: synced from the shared source (below)
 src/text/privacy.md          a copy of ../twisitter/PRIVACY.md: `yarn sync-privacy`
 src/components/ReplyDemo.astro   the made-up thread, as you and as others see it
 src/data/links.ts            store URLs: a button for each one set, "Coming soon" when none is
@@ -78,13 +80,16 @@ node scripts/make-images.mjs
 ## Deploy
 
 twisitter.com is a Cloudflare Worker named `twisitter-site`. Its pages are
-static files, and only `/api/*` runs its script (`worker/index.js`), for the
-report form. Cloudflare serves static files whole, ignoring requests for part
-of one (`Range`, checked 2026-11-21), so Chrome and Edge play and replay the
-intro video but can't skip through it. `deploy/cloudflare.config.ts` gives it:
+static files, and only `/api/*` (the report form) and the videos
+(`/assets/*.mp4`) run its script (`worker/index.js`). Cloudflare serves static
+files whole, ignoring a request for part of one (`Range`, checked 2026-11-21),
+and Chrome and Edge can't skip through a video served that way, so the Worker
+reads a video from the site's files and sends the part asked for.
+`deploy/cloudflare.config.ts` gives it:
 - the domain (Cloudflare made the DNS record and the certificate);
 - no workers.dev address;
 - the 404 page;
+- `ASSETS`, the site's static files, which the Worker reads the videos from;
 - `FEEDBACK`, a KV namespace: the private reports (`fb_*`);
 - `LIMITS`, a Durable Object (`Limits` in `worker/index.js`, SQLite storage):
   the site's one counter of reports, so the caps in `shared.json` hold
