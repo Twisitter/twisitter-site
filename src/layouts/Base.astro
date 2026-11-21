@@ -20,7 +20,7 @@ const image = `${site}/assets/og-image.png`
 // the live site allows: nothing from anywhere else, and no scripts at all, but
 // for the report form's own (public/_headers gives that page this policy alone).
 const csp =
-  "default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'" +
+  "default-src 'none'; img-src 'self'; media-src 'self'; style-src 'self'; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'" +
   (script ? "; script-src 'self'; connect-src 'self'" : '')
 ---
 <!doctype html>

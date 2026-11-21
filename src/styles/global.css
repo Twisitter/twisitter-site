@@ -421,6 +421,16 @@ p {
   color: var(--muted);
   font-size: 18px;
 }
+/* the intro video, at the container's width; dark like the video itself */
+.intro-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #000;
+}
 .ways {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

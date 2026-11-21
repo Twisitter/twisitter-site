@@ -49,6 +49,8 @@ src/text/privacy.md          a copy of ../twisitter/PRIVACY.md: `yarn sync-priva
 src/components/ReplyDemo.astro   the made-up thread, as you and as others see it
 src/data/links.ts            store URLs: a button for each one set, "Coming soon" when none is
 public/_headers              Cloudflare response headers
+public/assets/twisitter-intro.mp4, .jpg   the intro video on the landing page and its poster: the
+                             web copy and poster.jpg from ../twisitter-video, copied unchanged
 scripts/prelaunch.mjs        builds dist-prelaunch: the privacy page and the form alone (the site before launch)
 deploy/                      the Worker's config for `cf deploy`
 scripts/make-images.mjs      renders favicon.ico, apple-touch-icon.png and assets/og-image.png
@@ -77,7 +79,9 @@ node scripts/make-images.mjs
 
 twisitter.com is a Cloudflare Worker named `twisitter-site`. Its pages are
 static files, and only `/api/*` runs its script (`worker/index.js`), for the
-report form. `deploy/cloudflare.config.ts` gives it:
+report form. Cloudflare serves static files whole, ignoring requests for part
+of one (`Range`, checked 2026-11-21), so Chrome and Edge play and replay the
+intro video but can't skip through it. `deploy/cloudflare.config.ts` gives it:
 - the domain (Cloudflare made the DNS record and the certificate);
 - no workers.dev address;
 - the 404 page;

@@ -99,6 +99,29 @@ const faq = [
       </div>
     </section>
 
+    <section class="section" id="video">
+      <div class="container">
+        <div class="section-head">
+          <h2 id="video-title">See it in 80 seconds</h2>
+          <p>What a hidden reply looks like to you and to everyone else, and how Twisitter tells you.</p>
+        </div>
+        {/* the web copy from ../twisitter-video; nothing loads until it's played */}
+        <video
+          class="intro-video"
+          controls
+          playsinline
+          preload="none"
+          poster="/assets/twisitter-intro.jpg"
+          width="1920"
+          height="1080"
+          aria-labelledby="video-title"
+        >
+          <source src="/assets/twisitter-intro.mp4" type="video/mp4" />
+          <a href="/assets/twisitter-intro.mp4">Download the video</a>
+        </video>
+      </div>
+    </section>
+
     <section class="section" id="ways">
       <div class="container">
         <div class="section-head">
