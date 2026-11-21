@@ -1,0 +1,15 @@
+{
+  "testRunner": "node",
+  "modules": {
+    "reports": {
+      "origin": "https://twisitter.com",
+      "product": "Twisitter",
+      "userLabel": "X user",
+      "publicRepo": "Twisitter/twisitter",
+      "privateRepo": "Twisitter/reports",
+      "ids": "post",
+      "caps": { "perSender": 5, "keptPerHour": 30, "filedPerHour": 10 },
+      "accent": "#1d9bf0"
+    }
+  }
+}

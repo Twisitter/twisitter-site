@@ -1,8 +1,11 @@
 ---
 import Base from '../layouts/Base.astro'
+import shared from '../../shared.json'
+import { formSettings } from '../lib/report-settings.js'
 // The extension's "Report a problem" opens this page with its details in the
 // link's #fragment (its report.ts). A private report goes to /api/feedback
-// (worker/feedback.js); a public one is the person's own GitHub issue.
+// (worker/app.js); a public one is the person's own GitHub issue. The script
+// is src/lib/feedback-form.js, set up by shared.json.
 ---
 <Base
   title="Report a problem · Twisitter"
@@ -33,7 +36,7 @@ import Base from '../layouts/Base.astro'
         </div>
       </aside>
 
-      <form id="fb-form" class="fb-form" novalidate>
+      <form id="fb-form" class="fb-form" novalidate data-settings={JSON.stringify(formSettings(shared.modules.reports))}>
         <div class="fb-field">
           <label for="fb-type">What is it?</label>
           <select id="fb-type" class="fb-select">
@@ -104,111 +107,7 @@ import Base from '../layouts/Base.astro'
   </main>
 
   <script>
-    // What the extension's "Report a problem" link carries after #r= (its
-    // report.ts): the version, browser, status summary and diagnostic log. It
-    // never leaves this page unless the person sends it.
-    import { readDetails, idHider } from '../lib/report.js'
-    const ISSUES = 'https://github.com/Twisitter/twisitter/issues/new'
-
-    const details = readDetails(location.hash)
-    // Out of the address bar and the history, so the log doesn't linger there.
-    if (location.hash) history.replaceState(null, '', location.pathname + location.search)
-    // The same stand-ins for this report wherever its ids are hidden: in a
-    // private report the person chose to hide them in, and always in a public one.
-    const hide = idHider()
-    const hidden = details && { ...details, s: hide(details.s), l: hide(details.l) }
-    const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T
-    const form = $<HTMLFormElement>('fb-form')
-    const status = $<HTMLDivElement>('fb-status')
-    const type = $<HTMLSelectElement>('fb-type')
-    const include = $<HTMLInputElement>('fb-include')
-    const hideIds = $<HTMLInputElement>('fb-hide-ids')
-    const say = (text: string, kind: '' | 'ok' | 'err' = '') => {
-      status.textContent = text
-      status.className = `fb-status ${kind}`.trim()
-    }
-
-    // what a private report would send, which the box shows
-    const sending = () => (details && include.checked ? (hideIds.checked ? hidden : details) : null)
-    const preview = () => {
-      const d = hideIds.checked ? hidden : details
-      if (d) $('fb-details-text').textContent = `${d.s}\n\n${d.l}`
-    }
-    // no details: point the person at the extension's own button
-    if (!details) $('fb-from-extension').hidden = false
-    if (details) {
-      $('fb-details').hidden = false
-      $('fb-details-line').textContent = `Twisitter ${details.v} · ${details.b}`
-      preview()
-    }
-    hideIds.addEventListener('change', preview)
-
-    form.addEventListener('submit', async e => {
-      e.preventDefault()
-      say('')
-      const message = $<HTMLTextAreaElement>('fb-message').value.trim()
-      if (!message) return say('Please say what happened.', 'err')
-      const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement
-      btn.disabled = true
-      btn.textContent = 'Sending…'
-      try {
-        const res = await fetch('/api/feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: type.value,
-            message,
-            username: $<HTMLInputElement>('fb-username').value,
-            email: $<HTMLInputElement>('fb-email').value,
-            details: sending(),
-            website: $<HTMLInputElement>('fb-website').value,
-          }),
-        })
-        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Failed')
-        say('Sent. Thank you!', 'ok')
-        form.reset()
-        preview()
-      } catch (err) {
-        say(err instanceof Error && err.message !== 'Failed' ? err.message : 'Something went wrong. Try again?', 'err')
-      } finally {
-        btn.disabled = false
-        btn.textContent = 'Send privately'
-      }
-    })
-
-    // A public issue, filled in the same way. GitHub turns away very long
-    // links, so the log goes by the clipboard (copied first: the new tab takes
-    // the focus a copy needs).
-    $('fb-github').addEventListener('click', async () => {
-      const message = $<HTMLTextAreaElement>('fb-message').value.trim()
-      const d = details && include.checked ? hidden : null // public: ids always hidden
-      const params = new URLSearchParams({ template: 'problem.yml' })
-      if (message) params.set('what-happened', message.slice(0, 1500))
-      if (d) {
-        params.set('version', `${d.v}, ${d.b}`)
-        params.set('status', d.s.slice(0, 1500))
-      }
-      let copied = false
-      if (d?.l) {
-        try {
-          await navigator.clipboard.writeText(d.l)
-          copied = true
-        } catch {
-          // no clipboard: show the copy with ids hidden, to copy by hand
-          hideIds.checked = true
-          preview()
-          ;($('fb-details').querySelector('details') as HTMLDetailsElement).open = true
-        }
-      }
-      window.open(`${ISSUES}?${params}`, '_blank', 'noopener')
-      say(
-        copied
-          ? 'GitHub opened in a new tab. The log is on your clipboard: paste it into the log box there.'
-          : d
-            ? 'GitHub opened in a new tab. To add the log, copy it from the box above, where post ids are now hidden.'
-            : 'GitHub opened in a new tab.',
-        'ok',
-      )
-    })
+    import { startReportForm } from '../lib/feedback-form.js'
+    startReportForm()
   </script>
 </Base>

@@ -18,10 +18,10 @@ export default defineConfig({
       // the private reports (created by the first deploy, 2026-11-16)
       FEEDBACK: bindings.kv({ id: "2f760fa0d1544e7ba5a75b7f89f102eb" }),
       LIMITS: bindings.durableObject({ worker: "twisitter-site", exportName: "Limits" }),
-      // where private reports are filed: its workflow opens the issue
-      GITHUB_REPO: bindings.text("Twisitter/reports"),
       // set with `cf workers secrets update`, never in a file: a token with
-      // Actions read and write on that repository only, and the inbox's key
+      // Actions read and write on the private reports repository only (its
+      // workflow opens the issue; shared.json names it, as
+      // modules.reports.privateRepo), and the inbox's key
       GITHUB_TOKEN: bindings.secret(),
       FEEDBACK_KEY: bindings.secret(),
     },

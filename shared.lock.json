@@ -1,0 +1,18 @@
+{
+  "about": "Written by the sync from the shared source: each file it syncs into this repo, with its sha256. Change those files in the shared source, not here; a test fails when one is edited here.",
+  "modules": {
+    "core": {
+      "test/shared-files.test.mjs": "8526ab2c85a82458da887b6d2839d82fce1da1685ffb4d7789795429cafa8d82"
+    },
+    "reports": {
+      "src/lib/feedback-form.js": "600c899aae28383cdd1977fcdd8e1deb3d77b99f4eb42d0ad7e43fcc0a5ddd4c",
+      "src/lib/feedback-handler.js": "c9a8285df885dbd12d92a6a70ebbe45fd981fb93f3d6850858f327791f08bde3",
+      "src/lib/report-settings.js": "5aa96c36c5f1345373f871f524d8f1034b2e57718271884367b5066cf0e56a2f",
+      "src/lib/report.js": "b54236d76d616204aa313c580822e8a2ac3a82f497924e851f16523091a2488b",
+      "test/feedback-form.test.mjs": "e3dc3dedc9be83b6b9a45e4ea2042005b6944e58157d195052f9084744036f1c",
+      "test/feedback-handler.test.mjs": "0ad989b16d10039d235762f0d7335e3f2aa0a767a811f7fead7eaa88a804ca15",
+      "test/report-settings.test.mjs": "3b2ff1a88e7f98700e122243726ef6566920a20e66aec244fb04e5a76f7dfee6",
+      "test/report.test.mjs": "8d6267b7e3b9dc8640498d2cdea61fb089ac94b55a0741e864746d0cf93b8986"
+    }
+  }
+}

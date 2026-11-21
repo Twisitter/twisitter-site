@@ -1,13 +1,19 @@
 // How many reports twisitter.com takes in an hour, counted in one place for
-// the whole site (limits.js), so the caps hold everywhere at once. Plain JS,
-// so node's test runner can check it without Cloudflare's runtime.
+// the whole site (limits.js), so the caps hold everywhere at once. The caps
+// are shared.json's (modules.reports.caps). Plain JS, so node's test runner can
+// check it without Cloudflare's runtime.
+import shared from '../shared.json' with { type: 'json' }
 
-export const PER_HOUR = 5 // from one sender (an address, or an IPv6 /64)
+const { caps } = shared.modules.reports
+for (const cap of ['perSender', 'keptPerHour', 'filedPerHour']) {
+    if (!Number.isInteger(caps?.[cap])) throw new Error(`This counter keeps the whole site's caps too: shared.json's modules.reports.caps needs ${cap}.`)
+}
+export const PER_HOUR = caps.perSender // from one sender (an address, or an IPv6 /64)
 // kept from everyone together: a flood stops here, and the inbox stays small
-export const KEPT_PER_HOUR = 30
+export const KEPT_PER_HOUR = caps.keptPerHour
 // filed as issues from everyone together: each is an email to the developer
 // and a run of the reports workflow. Past it, a report is still kept.
-export const FILED_PER_HOUR = 10
+export const FILED_PER_HOUR = caps.filedPerHour
 
 export const hourOf = (t = Date.now()) => Math.floor(t / 3600000)
 

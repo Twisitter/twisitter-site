@@ -1,6 +1,8 @@
+// Synced from the shared source (see shared.json): change it there, not here.
+//
 // The details the extension's "Report a problem" link carries (its report.ts),
-// and hiding the post ids in them. Plain JS, so the report page and node's
-// test runner share it.
+// and hiding the ids in them. Plain JS, so the report page and node's test
+// runner share it.
 
 /**
  * @typedef {{ v: string, b: string, s: string, l: string }} Details
@@ -35,10 +37,10 @@ const randomStandIn = () => {
 }
 
 /**
- * A post id (#123) leads to whoever wrote the post, and for your own replies
+ * An id (#123) leads to whoever wrote what it names, and for your own posts
  * that's you. This swaps each for a random stand-in that stays the same
- * throughout one report, so the log still shows the same reply coming up again
- * (listed at 10:05, missing at 14:00) without saying which reply it is.
+ * throughout one report, so the log still shows the same one coming up again
+ * (seen at 10:05, gone at 14:00) without saying which it is.
  * @returns {(text: string) => string}
  */
 export function idHider(makeStandIn = randomStandIn) {

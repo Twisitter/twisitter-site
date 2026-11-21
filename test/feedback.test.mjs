@@ -1,12 +1,13 @@
-// The report form's handler (worker/feedback.js) with a stand-in KV, counter
-// and fetch: who may send, what's kept, the hourly caps, the issue it files
-// and the inbox. The counter runs the real counting (caps.js); its Durable
-// Object wrapper (limits.js) needs Cloudflare's runtime, so app.js is loaded
-// instead of index.js.
+// The Worker's report form handler (worker/app.js): the shared core with this
+// site's settings and its one counter for the whole site, with a stand-in KV,
+// Durable Object and fetch. The counter runs the real counting (caps.js); its
+// Durable Object wrapper (limits.js) needs Cloudflare's runtime, so app.js is
+// loaded instead of index.js. The core's own tests are synced from the shared
+// source: feedback-handler.test.mjs and the others in this folder.
 import { test, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
+import shared from '../shared.json' with { type: 'json' }
 import worker from '../worker/app.js'
-import { addressOf, issueFor } from '../worker/feedback.js'
 import { admitCounts, FILED_PER_HOUR, hourOf, KEPT_PER_HOUR, PER_HOUR } from '../worker/caps.js'
 
 function fakeKv() {
@@ -37,7 +38,7 @@ function fakeLimits() {
 
 let env, waits, dispatched
 beforeEach(() => {
-  env = { FEEDBACK: fakeKv(), LIMITS: fakeLimits(), GITHUB_REPO: 'Twisitter/reports', GITHUB_TOKEN: 'test-token', FEEDBACK_KEY: 'inbox-key' }
+  env = { FEEDBACK: fakeKv(), LIMITS: fakeLimits(), GITHUB_TOKEN: 'test-token', FEEDBACK_KEY: 'inbox-key' }
   waits = []
   dispatched = []
   globalThis.fetch = async (url, init) => {
@@ -51,7 +52,7 @@ const post = (body, headers = {}) =>
     new Request('https://twisitter.com/api/feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Origin: 'https://twisitter.com', 'CF-Connecting-IP': '203.0.113.9', ...headers },
-      body: typeof body === 'string' ? body : JSON.stringify(body),
+      body: JSON.stringify(body),
     }),
     env,
     ctx(),
@@ -62,33 +63,21 @@ test('keeps a report from the form, then files it through the private repository
   const details = { v: '0.0.1', b: 'Chrome 142, macOS', s: 'Watching 2 replies', l: '11-16 20:03 round · #a1b2c3 missing (4 reads)' }
   const res = await post({ type: 'bug', message: 'A reply shows as listed\nbut a friend can’t see it', username: 'someone', email: 'me@example.com', details })
   assert.equal(res.status, 200)
-  assert.deepEqual(await res.json(), { ok: true })
-  const [kept] = reports()
-  assert.equal(kept.type, 'bug')
-  assert.equal(kept.username, 'someone')
-  assert.deepEqual(kept.details, details)
+  assert.deepEqual(reports()[0].details, details)
   await Promise.all(waits)
   assert.equal(dispatched.length, 1)
   assert.equal(dispatched[0].url, 'https://api.github.com/repos/Twisitter/reports/actions/workflows/file-report.yml/dispatches')
-  assert.equal(dispatched[0].init.headers.Authorization, 'Bearer test-token')
+  assert.equal(dispatched[0].init.headers['User-Agent'], 'twisitter-feedback')
   const sent = JSON.parse(dispatched[0].init.body)
-  assert.equal(sent.ref, 'main')
   assert.equal(sent.inputs.title, 'Problem: A reply shows as listed')
-  assert.equal(sent.inputs.labels, 'bug')
   assert.match(sent.inputs.body, /X user: `someone` · email: `me@example\.com`/)
-  // filed: the inbox can link to it
+  assert.match(sent.inputs.body, /\*\*Twisitter\*\* `0\.0\.1` · `Chrome 142, macOS`/)
   assert.equal(reports()[0].filed, true)
 })
 
-test('only the form on twisitter.com may send, and a bot that fills the hidden field is thanked and forgotten', async () => {
-  assert.equal((await post({ message: 'hi' }, { Origin: 'https://elsewhere.example' })).status, 403)
-  assert.equal((await post({ message: 'hi' }, { Origin: '' })).status, 403)
-  assert.equal((await post({ message: 'hi', website: 'http://spam.example' })).status, 200)
-  assert.equal((await post({ message: '  ' })).status, 400)
-  assert.equal((await post('{not json')).status, 400)
-  assert.equal((await post({ message: 'x'.repeat(70000) })).status, 413)
-  assert.equal(reports().length, 0)
-  assert.equal(dispatched.length, 0)
+test('the caps are the ones shared.json sets', () => {
+  const { caps } = shared.modules.reports
+  assert.deepEqual([PER_HOUR, KEPT_PER_HOUR, FILED_PER_HOUR], [caps.perSender, caps.keptPerHour, caps.filedPerHour])
 })
 
 test(`one address gets ${PER_HOUR} reports an hour, counted by a salted hash and never the address`, async () => {
@@ -102,14 +91,6 @@ test(`one address gets ${PER_HOUR} reports an hour, counted by a salted hash and
   assert.ok([...env.FEEDBACK.data.keys()].every(k => k.startsWith('fb_')))
 })
 
-test('an IPv6 sender’s whole /64 counts as one address, and an IPv4 address is itself', () => {
-  assert.equal(addressOf('203.0.113.9'), '203.0.113.9')
-  assert.equal(addressOf('2001:db8:aa:bb:1:2:3:4'), '2001:db8:aa:bb::/64')
-  assert.equal(addressOf('2001:0DB8:00aa:bb::9'), '2001:db8:aa:bb::/64')
-  assert.equal(addressOf('2001:db8::1'), '2001:db8:0:0::/64')
-  assert.equal(addressOf('::ffff:203.0.113.9'), '203.0.113.9')
-})
-
 test('addresses in one IPv6 /64 share the hourly cap', async () => {
   for (let i = 0; i < PER_HOUR; i++) assert.equal((await post({ message: `report ${i}` }, { 'CF-Connecting-IP': `2001:db8:aa:bb::${i + 1}` })).status, 200)
   assert.equal((await post({ message: 'a new address, same network' }, { 'CF-Connecting-IP': '2001:db8:aa:bb:ffff::1' })).status, 429)
@@ -120,9 +101,17 @@ test('when the counter can’t be asked, a report is turned away as the site’s
   env.LIMITS.object.admit = async () => {
     throw new Error('Durable Object unavailable')
   }
-  const res = await post({ message: 'while the counter is down' })
-  assert.equal(res.status, 503)
-  assert.match((await res.json()).error, /can't be taken right now/)
+  const consoleError = console.error
+  console.error = () => {}
+  try {
+    const res = await post({ message: 'while the counter is down' })
+    assert.equal(res.status, 503)
+    assert.match((await res.json()).error, /can't be taken right now/)
+    delete env.LIMITS
+    assert.equal((await post({ message: 'with no counter bound' })).status, 503)
+  } finally {
+    console.error = consoleError
+  }
   assert.equal(reports().length, 0)
 })
 
@@ -145,36 +134,13 @@ test('the counts start over each hour', () => {
   assert.deepEqual(next.counts, { hour: 8, kept: 1, filed: 1, senders: { a: 1 } })
 })
 
-test('a report’s own words can’t turn into mentions or links in the issue', () => {
-  const { body } = issueFor('fb_x', {
-    type: 'other',
-    message: 'ping @someone ``` and [a link](https://example.com)',
-    username: '@another`one',
-    email: '',
-    details: { v: '0.0.1', b: '@third', s: 's', l: 'l' },
-  })
-  // the message sits in a fence longer than any run of backticks in it
-  assert.match(body, /^````text\nping @someone ``` and \[a link\]\(https:\/\/example\.com\)\n````/)
-  assert.match(body, /X user: `@anotherone`/)
-  assert.match(body, /\*\*Twisitter\*\* `0\.0\.1` · `@third`/)
-})
-
-test('the inbox needs its key, and its page passes the key on to no link', async () => {
+test('the inbox is at /api/feedback, another method there is refused, and anything else under /api is not found', async () => {
   await post({ message: 'kept for the inbox' })
-  const get = q => worker.fetch(new Request(`https://twisitter.com/api/feedback${q}`), env, ctx())
-  assert.equal((await get('')).status, 401)
-  assert.equal((await get('?key=wrong')).status, 401)
-  const page = await get('?key=inbox-key')
+  const page = await worker.fetch(new Request('https://twisitter.com/api/feedback?key=inbox-key'), env, ctx())
   assert.equal(page.status, 200)
-  assert.equal(page.headers.get('Referrer-Policy'), 'no-referrer')
-  assert.equal(page.headers.get('Cache-Control'), 'no-store')
-  assert.match(await page.text(), /kept for the inbox/)
-  // no key set: no inbox at all
-  delete env.FEEDBACK_KEY
-  assert.equal((await get('?key=')).status, 401)
-})
-
-test('anything else under /api is not found', async () => {
-  const res = await worker.fetch(new Request('https://twisitter.com/api/other'), env, ctx())
-  assert.equal(res.status, 404)
+  assert.match(await page.text(), /<title>Twisitter reports<\/title>[\s\S]*kept for the inbox/)
+  const put = await worker.fetch(new Request('https://twisitter.com/api/feedback', { method: 'PUT' }), env, ctx())
+  assert.equal(put.status, 405)
+  assert.equal(put.headers.get('Allow'), 'GET, POST')
+  assert.equal((await worker.fetch(new Request('https://twisitter.com/api/other'), env, ctx())).status, 404)
 })
