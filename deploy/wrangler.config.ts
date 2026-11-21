@@ -1,3 +1,3 @@
 import { defineWranglerConfig } from "wrangler/experimental-config";
 
-export default defineWranglerConfig({ assetsDirectory: "public" });
+export default defineWranglerConfig({ assetsDirectory: "../dist" });

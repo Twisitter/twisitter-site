@@ -98,15 +98,26 @@ Reports are filed in the private repository `shared.json` names
 is `/api/feedback?key=<FEEDBACK_KEY>`. Without `GITHUB_TOKEN` a report is still
 kept there.
 
-`cf deploy` (Cloudflare's `cf` CLI, Node 22 or later) loads that config with
-the `cf` and `wrangler` packages (cf 1.0.0-beta.12, wrangler 4.147.0). This site
-doesn't install them, so point `deploy/node_modules` at an install that has
-them, and set `CLOUDFLARE_ACCOUNT_ID` to the account that holds twisitter.com.
+A push to `main` deploys it. Cloudflare's builds for Workers, connected to this
+repository on the Worker, run the build command, which stops at a failing test,
+then the deploy command:
+
+```
+git fetch --unshallow || true && node .yarn/releases/yarn-4.14.1.cjs install --immutable && node .yarn/releases/yarn-4.14.1.cjs test && node .yarn/releases/yarn-4.14.1.cjs build
+cd deploy && npm ci --ignore-scripts --no-audit --no-fund && npx cf deploy
+```
+
+`deploy/package.json` pins `cf` and `wrangler` (cf 1.0.0-beta.12, wrangler
+4.147.0), and `deploy/package-lock.json` pins everything they need, each older
+than 7 days when locked. `.nvmrc` gives the build its Node (`cf` needs 22.23 or
+later). The build deploys with a token Cloudflare made for it. The sitemap dates
+pages by their last commit, hence the full fetch.
+
+To deploy by hand instead, with `CLOUDFLARE_ACCOUNT_ID` set to the account that
+holds twisitter.com:
 
 ```bash
-yarn build                                          # dist
-rm -rf deploy/public && cp -R dist deploy/public
-(cd deploy && cf deploy --dry-run) && (cd deploy && cf deploy)
+yarn build && (cd deploy && npm ci --ignore-scripts && npx cf deploy --dry-run && npx cf deploy)
 ```
 
 Before launch (2026-11-15 to 11-20), `yarn build-prelaunch` built
