@@ -9,7 +9,9 @@
     "build-prelaunch": "yarn build && node scripts/prelaunch.mjs",
     "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
     "test": "node --test test/*.test.mjs",
-    "sync-privacy": "cp ../twisitter/PRIVACY.md src/text/privacy.md"
+    "sync-privacy": "cp ../twisitter/PRIVACY.md src/text/privacy.md",
+    "build:cloudflare": "git fetch --unshallow || true; node .yarn/releases/yarn-4.14.1.cjs install --immutable && node .yarn/releases/yarn-4.14.1.cjs test && node .yarn/releases/yarn-4.14.1.cjs build",
+    "deploy": "cd deploy && npm ci --ignore-scripts --no-audit --no-fund && npx cf deploy"
   },
   "dependencies": {
     "astro": "^5.0.0"

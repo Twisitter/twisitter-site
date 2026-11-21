@@ -99,25 +99,23 @@ is `/api/feedback?key=<FEEDBACK_KEY>`. Without `GITHUB_TOKEN` a report is still
 kept there.
 
 A push to `main` deploys it. Cloudflare's builds for Workers, connected to this
-repository on the Worker, run the build command, which stops at a failing test,
-then the deploy command:
-
-```
-git fetch --unshallow || true && node .yarn/releases/yarn-4.14.1.cjs install --immutable && node .yarn/releases/yarn-4.14.1.cjs test && node .yarn/releases/yarn-4.14.1.cjs build
-cd deploy && npm ci --ignore-scripts --no-audit --no-fund && npx cf deploy
-```
+repository on the Worker, run `npm run build:cloudflare` (fetch the full history
+for the sitemap's dates, install, test, build: a failing test stops it) and then
+`npm run deploy` (install the pinned `cf` and `wrangler` in `deploy/`, then
+`cf deploy`). Both are scripts in `package.json`, so a change to either is a
+commit here, not a setting in Cloudflare. They run with npm because the build's
+Node (26, from `.nvmrc`) has no Corepack to put `yarn` on its path.
 
 `deploy/package.json` pins `cf` and `wrangler` (cf 1.0.0-beta.12, wrangler
 4.147.0), and `deploy/package-lock.json` pins everything they need, each older
-than 7 days when locked. `.nvmrc` gives the build its Node (`cf` needs 22.23 or
-later). The build deploys with a token Cloudflare made for it. The sitemap dates
-pages by their last commit, hence the full fetch.
+than 7 days when locked. `cf` needs Node 22.23 or later. The build deploys with
+a token Cloudflare made for it.
 
 To deploy by hand instead, with `CLOUDFLARE_ACCOUNT_ID` set to the account that
 holds twisitter.com:
 
 ```bash
-yarn build && (cd deploy && npm ci --ignore-scripts && npx cf deploy --dry-run && npx cf deploy)
+yarn build && npm run deploy -- --dry-run && npm run deploy
 ```
 
 Before launch (2026-11-15 to 11-20), `yarn build-prelaunch` built
