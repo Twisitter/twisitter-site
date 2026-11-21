@@ -97,10 +97,10 @@ Reports are filed in the private repository `shared.json` names
 is `/api/feedback?key=<FEEDBACK_KEY>`. Without `GITHUB_TOKEN` a report is still
 kept there.
 
-`cf deploy` (Cloudflare's `cf` CLI, Node 22) loads that config with the `cf`
-and `wrangler` packages (cf 1.0.0-beta.12, wrangler 4.147.0). This site doesn't
-install them, so point `deploy/node_modules` at an install that has them, and
-set `CLOUDFLARE_ACCOUNT_ID` to the account that holds twisitter.com.
+`cf deploy` (Cloudflare's `cf` CLI, Node 22 or later) loads that config with
+the `cf` and `wrangler` packages (cf 1.0.0-beta.12, wrangler 4.147.0). This site
+doesn't install them, so point `deploy/node_modules` at an install that has
+them, and set `CLOUDFLARE_ACCOUNT_ID` to the account that holds twisitter.com.
 
 ```bash
 yarn build                                          # dist

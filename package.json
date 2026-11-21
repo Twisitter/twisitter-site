@@ -8,7 +8,7 @@
     "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
     "build-prelaunch": "yarn build && node scripts/prelaunch.mjs",
     "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
-    "test": "node --test test/",
+    "test": "node --test test/*.test.mjs",
     "sync-privacy": "cp ../twisitter/PRIVACY.md src/text/privacy.md"
   },
   "dependencies": {
