@@ -43,9 +43,8 @@ src/pages/privacy.astro      renders src/text/privacy.md
 src/pages/feedback.astro     the report form the extension's "Report a problem" opens
 src/lib/                     the form's script, and the handler that keeps a private report, files it in
                              the reports repo, and the inbox: synced from the shared source (below)
-worker/index.js              the Worker's entry, for /api/* only: app.js and the Limits class
-worker/app.js                routes /api/feedback to the shared handler (tests load this, not index.js)
-worker/caps.js, limits.js    the hourly caps, counted once for the whole site by a Durable Object
+worker/index.js              the Worker, for /api/* only, and the Durable Object that counts the
+                             site's reports: synced from the shared source (below)
 src/text/privacy.md          a copy of ../twisitter/PRIVACY.md: `yarn sync-privacy`
 src/components/ReplyDemo.astro   the made-up thread, as you and as others see it
 src/data/links.ts            store URLs: a button for each one set, "Coming soon" when none is
@@ -57,13 +56,15 @@ scripts/og-image.html        the social card's source
 ```
 
 The report form's code is synced from the shared source
-(`../extension-shared`, its `reports` module): `src/lib/report.js`,
-`report-settings.js`, `feedback-form.js` and `feedback-handler.js`, with their
-tests in `test/` (all but `feedback.test.mjs` and `privacy.test.mjs`, which
-are this site's). Change them there, then `node sync.mjs ../twisitter-site`
-there; a test here fails when a synced file is edited here. `shared.json` holds
-this site's settings for them (the origin, the names, the two repositories, the
-caps), and `shared.lock.json` is written by the sync.
+(`../extension-shared`, its `reports` module): `src/lib/` (the form's script and
+the handler that keeps a private report, files it in the reports repo, and the
+inbox), `worker/index.js` (the Worker and the Durable Object that counts
+reports), and the tests in `test/` (all but `privacy.test.mjs`, which is this
+site's). ghostedwatch.com runs the same Worker. Change them there, then
+`node sync.mjs ../twisitter-site` there; a test here fails when a synced file
+is edited here. `shared.json` holds this site's settings for them (the origin,
+the names, the two repositories, the hourly caps), and `shared.lock.json` is
+written by the sync.
 
 `scripts/make-images.mjs` borrows Playwright from `../twisitter`, so the site
 keeps one dependency. Run it after changing the mark or the card:
@@ -81,12 +82,12 @@ report form. `deploy/cloudflare.config.ts` gives it:
 - no workers.dev address;
 - the 404 page;
 - `FEEDBACK`, a KV namespace: the private reports (`fb_*`);
-- `LIMITS`, a Durable Object (`worker/limits.js`, SQLite storage): the site's
-  one counter of reports, so the caps in `shared.json` (`worker/caps.js` counts
-  them) hold everywhere at once: 5 an hour per sender (a salted hash of the
-  address, or its IPv6 /64), 30 kept and 10 filed as issues an hour from
-  everyone together. It keeps only the current hour's counts, and an alarm
-  drops them within two hours;
+- `LIMITS`, a Durable Object (`Limits` in `worker/index.js`, SQLite storage):
+  the site's one counter of reports, so the caps in `shared.json` hold
+  everywhere at once: 5 an hour per sender (a salted hash of the address, or
+  its IPv6 /64), 30 kept and 10 filed as issues an hour from everyone together.
+  It keeps only the current hour's counts, and an alarm drops them within two
+  hours;
 - two secrets, set with `cf workers secrets update`, never in a file:
   `GITHUB_TOKEN`, a fine-grained token with Actions read and write on the
   private reports repository only, and `FEEDBACK_KEY`, the inbox's key and the
