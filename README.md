@@ -95,8 +95,9 @@ report form. `deploy/cloudflare.config.ts` gives it:
 
 Reports are filed in the private repository `shared.json` names
 (`Twisitter/reports`, by `.github/workflows/file-report.yml` there). The inbox
-is `/api/feedback?key=<FEEDBACK_KEY>`. Without `GITHUB_TOKEN` a report is still
-kept there.
+is `/api/feedback`: open `/api/feedback?key=<FEEDBACK_KEY>` once, and it sets a
+cookie for 30 days and takes the key out of the address. Without `GITHUB_TOKEN`
+a report is still kept there.
 
 A push to `main` deploys it. Cloudflare's builds for Workers, connected to this
 repository on the Worker, run `npm run build:cloudflare` (fetch the full history
